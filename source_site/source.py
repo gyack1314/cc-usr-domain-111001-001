@@ -33,6 +33,9 @@ class Source:
 
     def dispatch(self, method, path, q, h, body):
         records = json_file("notices.json")
+        inserted = {"id": "n4", "title": "新增活动", "time": "2026-11-15T09:00:00+08:00", "body": "合成新活动公告", "version": 1, "url": "/detail/n4"}
+        if self.phase == "moving" and self.state.get("inserted"):
+            records.insert(0, inserted)
         if self.phase == "revised":
             records[0]["body"] = "体验场地由南门改到东门"
             records[0]["version"] = 2
@@ -43,8 +46,9 @@ class Source:
             page = int(q.get("page", ["1"])[0])
             if self.phase == "partial" and page == 2:
                 return 503, {}, {"error": "栏目临时不可读"}
-            if self.phase == "moving" and page > 1:
-                records.insert(0, {"id": "n4", "title": "新增活动", "time": "2026-11-15T09:00:00+08:00", "body": "合成新活动公告", "version": 1, "url": "/detail/n4"})
+            if self.phase == "moving" and page > 1 and not self.state.get("inserted"):
+                self.state["inserted"] = True
+                records.insert(0, inserted)
             part = records[(page-1)*2:page*2]
             links = "".join('<li data-id="{id}"><a href="{url}">{title}</a></li>'.format(**r) for r in part)
             nxt = (page if self.phase == "loop" else page+1) if page*2 < len(records) else None

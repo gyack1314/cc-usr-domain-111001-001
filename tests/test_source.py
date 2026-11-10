@@ -8,6 +8,14 @@ from source_site.__main__ import running
 
 
 class SourceTests(unittest.TestCase):
+    def test_moving_insert_survives_rescan(self):
+        s = Source()
+        s.phase = "moving"
+        self.assertNotIn(b"n4", s.request("GET", "/list", {"page": ["1"]})[2])
+        s.request("GET", "/list", {"page": ["2"]})
+        self.assertIn(b"n4", s.request("GET", "/list", {"page": ["1"]})[2])
+        self.assertEqual(200, s.request("GET", "/detail/n4")[0])
+
     def test_source_1(self):
         s = Source()
         self.assertIn(b"n1", s.request("GET", "/list", {"page": ["1"]})[2])
