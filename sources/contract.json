@@ -1,0 +1,12 @@
+{
+  "GET /list?page=N": "每页两项，rel=next 翻页，来源编号可跨页重复",
+  "GET /detail/{id}": "详情HTML与ETag，支持If-None-Match",
+  "phases": [
+    "base",
+    "revised",
+    "missing",
+    "partial",
+    "moving",
+    "loop"
+  ]
+}
